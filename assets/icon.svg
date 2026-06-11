@@ -1,0 +1,24 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a8bff"/>
+      <stop offset="1" stop-color="#1b5fd9"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.20"/>
+      <stop offset="0.55" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Cuerpo (squircle) -->
+  <rect x="64" y="64" width="896" height="896" rx="224" fill="url(#bg)"/>
+  <rect x="64" y="64" width="896" height="896" rx="224" fill="url(#sheen)"/>
+  <rect x="64" y="64" width="896" height="896" rx="224" fill="none"
+        stroke="#ffffff" stroke-opacity="0.12" stroke-width="3"/>
+
+  <!-- Prompt de terminal  >_  -->
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="372,360 528,512 372,664" stroke="#ffffff" stroke-width="78"/>
+    <line x1="566" y1="652" x2="716" y2="652" stroke="#56d364" stroke-width="78"/>
+  </g>
+</svg>

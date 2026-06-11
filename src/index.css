@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+/* ── Tema ADBox (oscuro) ───────────────────────────────────────────── */
+@theme {
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-surface-2: #1c2430;
+  --color-border: #283042;
+  --color-muted: #8b97a8;
+  --color-text: #e6edf3;
+  --color-accent: #2f81f7;
+  --color-accent-2: #1f6feb;
+  --color-ok: #3fb950;
+  --color-warn: #d29922;
+  --color-danger: #f85149;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+}
+
+/* Scrollbars discretas y acordes al tema oscuro. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 6px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a4456;
+}
+
+/* Tipografía monoespaciada para la consola de salida. */
+.font-mono {
+  font-family: "JetBrains Mono", "Fira Code", ui-monospace, "Cascadia Code",
+    Consolas, monospace;
+}
