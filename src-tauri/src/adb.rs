@@ -418,3 +418,46 @@ pub async fn adb_install(app: AppHandle, state: State<'_, AdbState>) -> Result<S
     *state.path.lock().unwrap() = bin.clone();
     Ok(bin)
 }
+
+// ─────────────────────────── Espejado de pantalla ─────────────────────────
+
+/// Comprueba si scrcpy está disponible en el sistema.
+fn scrcpy_available() -> bool {
+    let mut cmd = Command::new("scrcpy");
+    cmd.arg("--version");
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+    cmd.stdout(Stdio::null())
+        .stderr(Stdio::null())
+        .status()
+        .map(|s| s.success())
+        .unwrap_or(false)
+}
+
+/// Lanza scrcpy para espejar la pantalla del dispositivo en una ventana aparte.
+/// Requiere scrcpy instalado (no viene con adb).
+#[tauri::command]
+pub fn launch_scrcpy(serial: Option<String>) -> Result<(), String> {
+    if !scrcpy_available() {
+        return Err(
+            "scrcpy no está instalado. En Linux: `sudo apt install scrcpy`. \
+             En Windows/macOS: https://github.com/Genymobile/scrcpy"
+                .to_string(),
+        );
+    }
+    let mut cmd = Command::new("scrcpy");
+    if let Some(s) = serial {
+        cmd.arg("-s").arg(s);
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+    cmd.spawn()
+        .map_err(|e| format!("No se pudo abrir scrcpy: {e}"))?;
+    Ok(())
+}

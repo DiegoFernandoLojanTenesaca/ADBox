@@ -2,6 +2,7 @@ import { listen } from "@tauri-apps/api/event";
 import { useEffect } from "react";
 import { ActionGrid } from "./components/ActionGrid";
 import { Console } from "./components/Console";
+import { DebloatModal } from "./components/DebloatModal";
 import { DeviceInfo } from "./components/DeviceInfo";
 import { Dialog } from "./components/Dialog";
 import { Sidebar } from "./components/Sidebar";
@@ -47,6 +48,7 @@ function App() {
         <Console />
       </div>
       <Dialog />
+      <DebloatModal />
     </div>
   );
 }

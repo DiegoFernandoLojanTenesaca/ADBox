@@ -32,3 +32,7 @@ export const logcatStop = (id: number) => invoke<void>("adb_logcat_stop", { id }
 
 /** Descarga e instala ADB automáticamente (platform-tools de Google). */
 export const installAdb = () => invoke<string>("adb_install");
+
+/** Lanza scrcpy (espejado de pantalla) para el serial dado. */
+export const launchScrcpy = (serial: string | null) =>
+  invoke<void>("launch_scrcpy", { serial });

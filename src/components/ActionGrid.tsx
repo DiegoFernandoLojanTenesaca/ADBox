@@ -1,7 +1,8 @@
 /** Rejilla de tarjetas de acción para la categoría activa. */
 
-import { AlertTriangle, Info, Loader2, Lock, Play, ShieldAlert } from "lucide-react";
-import { actionsFor } from "../data/actions";
+import { AlertTriangle, Info, Loader2, Lock, Play, Search, ShieldAlert } from "lucide-react";
+import { useState } from "react";
+import { actionsFor, ALL_ACTIONS } from "../data/actions";
 import { CATEGORIES } from "../data/categories";
 import type { AdbAction, Danger } from "../lib/types";
 import { useStore } from "../store";
@@ -51,6 +52,11 @@ function InfoTip({ action }: { action: AdbAction }) {
         <span className="block text-xs leading-relaxed text-muted">
           {action.detail || action.description}
         </span>
+        {action.cmd && (
+          <span className="mt-2 block break-all rounded bg-bg px-2 py-1 font-mono text-[10px] text-accent">
+            $ {action.cmd}
+          </span>
+        )}
         <span className="mt-2 block text-[11px] leading-relaxed text-[color:var(--color-text)]">
           {RISK_TEXT[action.danger]}
         </span>
@@ -123,18 +129,49 @@ function Card({ action }: { action: AdbAction }) {
 export function ActionGrid() {
   const active = useStore((s) => s.activeCategory);
   const category = CATEGORIES.find((c) => c.id === active)!;
-  const actions = actionsFor(active);
+  const [query, setQuery] = useState("");
+
+  const q = query.trim().toLowerCase();
+  const actions = q
+    ? ALL_ACTIONS.filter(
+        (a) =>
+          a.label.toLowerCase().includes(q) ||
+          a.description.toLowerCase().includes(q),
+      )
+    : actionsFor(active);
 
   return (
-    <section className="flex-1 overflow-y-auto p-5">
-      <div className="mb-4">
-        <h1 className="text-lg font-semibold">{category.name}</h1>
-        <p className="text-sm text-muted">{category.description}</p>
+    <section className="flex min-h-0 flex-1 flex-col">
+      <div className="flex items-center gap-3 border-b border-border px-5 py-4">
+        <div className="min-w-0">
+          <h1 className="truncate text-lg font-semibold">
+            {q ? "Resultados de búsqueda" : category.name}
+          </h1>
+          <p className="truncate text-sm text-muted">
+            {q ? `${actions.length} acciones coinciden con «${query.trim()}»` : category.description}
+          </p>
+        </div>
+        <div className="relative ml-auto w-60 shrink-0">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar acción…"
+            className="w-full rounded-md border border-border bg-surface-2 py-2 pl-9 pr-3 text-sm outline-none focus:border-accent"
+          />
+        </div>
       </div>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3">
-        {actions.map((a) => (
-          <Card key={a.id} action={a} />
-        ))}
+
+      <div className="flex-1 overflow-y-auto p-5">
+        {actions.length === 0 ? (
+          <p className="text-sm text-muted">No hay acciones que coincidan.</p>
+        ) : (
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-3">
+            {actions.map((a) => (
+              <Card key={a.id} action={a} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

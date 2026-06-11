@@ -87,14 +87,16 @@ export function DeviceInfo() {
 
       <div>
         <div className="flex items-center gap-2">
-          <span className="text-lg font-bold text-[color:var(--color-text)]">
+          <span className="text-2xl font-bold tracking-tight text-white">
             {modelo}
           </span>
           {loading && (
             <Loader2 className="size-4 animate-spin text-muted" />
           )}
         </div>
-        <div className="text-sm text-muted">{marca}</div>
+        <div className="text-sm font-medium uppercase tracking-wide text-accent">
+          {marca}
+        </div>
       </div>
 
       <div className="ml-auto flex flex-wrap items-center gap-2">
@@ -133,9 +135,7 @@ function Chip({
       <span className="text-muted">{icon}</span>
       <div className="leading-tight">
         <div className="text-[10px] uppercase tracking-wide text-muted">{label}</div>
-        <div className="text-xs font-semibold text-[color:var(--color-text)]">
-          {value}
-        </div>
+        <div className="text-xs font-semibold text-white">{value}</div>
       </div>
     </div>
   );

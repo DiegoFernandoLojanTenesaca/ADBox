@@ -1,9 +1,24 @@
 /** Optimización — debloat por marca, animaciones, recompilado AOT y Doze. */
 
+import { useStore } from "../../store";
 import { BLOAT_BRANDS, brandFor } from "../bloatware";
 import { build, getprop } from "./helpers";
 
 export const optimizacion = build("optimizacion", [
+  {
+    id: "debloat-seleccion",
+    label: "Debloat con selección",
+    description: "Elige con casillas qué bloatware de la marca desinstalar.",
+    detail:
+      "Abre una lista de las apps de marca instaladas para que marques cuáles quitar. Sin root y reversible.",
+    cmd: "pm uninstall -k --user 0 <seleccionadas>",
+    danger: "danger",
+    free: true,
+    run: async (ctx) => {
+      useStore.getState().openDebloat();
+      ctx.log("Abriendo selección de bloatware…", "info");
+    },
+  },
   {
     id: "debloat-marca",
     label: "Debloat automático por marca",

@@ -1,8 +1,26 @@
-/** Pantalla y captura — captura al PC, toques/teclas y encender/apagar. */
+/** Pantalla y captura — espejado, captura al PC, toques/teclas y encender/apagar. */
 
+import { launchScrcpy } from "../../lib/adb";
 import { build } from "./helpers";
 
 export const pantalla = build("pantalla", [
+  {
+    id: "scrcpy",
+    label: "Espejar pantalla (scrcpy)",
+    description: "Abre la pantalla del teléfono en el PC para verla y controlarla en vivo.",
+    detail:
+      "Refleja y controla el teléfono desde el PC con scrcpy. Ideal para reparar sin tocar el equipo. Requiere scrcpy instalado (no viene con ADB).",
+    cmd: "scrcpy -s <serial>",
+    free: true,
+    run: async (ctx) => {
+      try {
+        await launchScrcpy(ctx.serial);
+        ctx.log("scrcpy abierto en una ventana aparte. 📱 → 🖥️", "ok");
+      } catch (e) {
+        ctx.log(String(e), "error");
+      }
+    },
+  },
   {
     id: "captura-pc",
     label: "Captura de pantalla al PC",

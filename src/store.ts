@@ -33,6 +33,9 @@ interface AppState {
   setAdbPath: (path: string) => Promise<void>;
   installing: boolean;
   installAdb: () => Promise<void>;
+  debloatOpen: boolean;
+  openDebloat: () => void;
+  closeDebloat: () => void;
 
   // ── navegación ──────────────────────────────────────────────────────
   activeCategory: CategoryId;
@@ -142,6 +145,10 @@ export const useStore = create<AppState>((set, get) => ({
       set({ installing: false });
     }
   },
+
+  debloatOpen: false,
+  openDebloat: () => set({ debloatOpen: true }),
+  closeDebloat: () => set({ debloatOpen: false }),
 
   activeCategory: "conexion",
   setCategory: (id) => set({ activeCategory: id }),

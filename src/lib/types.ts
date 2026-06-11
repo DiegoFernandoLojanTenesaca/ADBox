@@ -91,6 +91,8 @@ export interface AdbAction {
   description: string;
   /** Detalle ampliado (qué hace exactamente), mostrado en el tooltip de la «i». */
   detail?: string;
+  /** Comando adb representativo, mostrado en el tooltip de la «i». */
+  cmd?: string;
   danger: Danger;
   /** false → tarjeta visible pero marcada como "próximamente". */
   implemented: boolean;
