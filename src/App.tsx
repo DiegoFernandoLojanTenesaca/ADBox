@@ -2,6 +2,7 @@ import { listen } from "@tauri-apps/api/event";
 import { useEffect } from "react";
 import { ActionGrid } from "./components/ActionGrid";
 import { Console } from "./components/Console";
+import { DeviceInfo } from "./components/DeviceInfo";
 import { Dialog } from "./components/Dialog";
 import { Sidebar } from "./components/Sidebar";
 import { Topbar } from "./components/Topbar";
@@ -39,6 +40,7 @@ function App() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar />
+        <DeviceInfo />
         <ActionGrid />
         <Console />
       </div>
