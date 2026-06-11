@@ -63,14 +63,14 @@ export function Topbar() {
         </button>
       ) : (
         <>
-          <Smartphone className="size-4 text-muted" />
+          <Smartphone className="size-4 text-[color:var(--color-text)]" />
           {ready.length === 0 ? (
             <span className="text-sm text-muted">Sin dispositivos conectados</span>
           ) : (
             <select
               value={selected ?? ""}
               onChange={(e) => selectDevice(e.target.value)}
-              className="rounded-md border border-border bg-surface-2 px-2 py-1.5 text-sm outline-none focus:border-accent"
+              className="rounded-md border border-border bg-surface-2 px-2 py-1.5 text-sm font-medium text-white outline-none focus:border-accent"
             >
               {ready.map((d) => (
                 <option key={d.serial} value={d.serial}>
