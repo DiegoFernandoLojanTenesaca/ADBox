@@ -61,6 +61,6 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: "ADBox ${{ github.ref_name }}"
           releaseBody: "Descarga el binario para tu sistema operativo y ejecútalo. Requiere ADB instalado y depuración USB activada."
-          releaseDraft: true
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.args }}
