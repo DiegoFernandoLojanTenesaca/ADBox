@@ -1,9 +1,21 @@
 /** Barra superior: dispositivo activo, estado de adb y acciones globales. */
 
-import { RefreshCw, Smartphone, Square, Usb, Wifi } from "lucide-react";
+import {
+  Download,
+  Loader2,
+  RefreshCw,
+  Settings,
+  Smartphone,
+  Square,
+  Usb,
+  Wifi,
+} from "lucide-react";
+import { useState } from "react";
+import { AdbSettings } from "./AdbSettings";
 import { useStore } from "../store";
 
 export function Topbar() {
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const devices = useStore((s) => s.devices);
   const selected = useStore((s) => s.selectedSerial);
   const selectDevice = useStore((s) => s.selectDevice);
@@ -12,12 +24,15 @@ export function Topbar() {
   const adbReady = useStore((s) => s.adbReady);
   const liveLogcatId = useStore((s) => s.liveLogcatId);
   const stopLiveLogcat = useStore((s) => s.stopLiveLogcat);
+  const installing = useStore((s) => s.installing);
+  const installAdb = useStore((s) => s.installAdb);
 
   const ready = devices.filter((d) => d.state === "device");
   const current = devices.find((d) => d.serial === selected);
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4">
+    <>
+      <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-surface px-4">
       {/* Estado de adb */}
       <div className="flex items-center gap-2">
         <span
@@ -31,22 +46,40 @@ export function Topbar() {
 
       <div className="mx-1 h-6 w-px bg-border" />
 
-      {/* Selector de dispositivo */}
-      <Smartphone className="size-4 text-muted" />
-      {ready.length === 0 ? (
-        <span className="text-sm text-muted">Sin dispositivos conectados</span>
-      ) : (
-        <select
-          value={selected ?? ""}
-          onChange={(e) => selectDevice(e.target.value)}
-          className="rounded-md border border-border bg-surface-2 px-2 py-1.5 text-sm outline-none focus:border-accent"
+      {/* Instalación de ADB (si falta) o selector de dispositivo */}
+      {!adbReady ? (
+        <button
+          onClick={installAdb}
+          disabled={installing}
+          className="flex items-center gap-2 rounded-md bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-2 disabled:opacity-60"
+          title="Descarga el ADB oficial de Google y lo deja listo"
         >
-          {ready.map((d) => (
-            <option key={d.serial} value={d.serial}>
-              {d.model ?? d.serial} ({d.serial})
-            </option>
-          ))}
-        </select>
+          {installing ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Download className="size-4" />
+          )}
+          {installing ? "Instalando ADB…" : "Instalar ADB automáticamente"}
+        </button>
+      ) : (
+        <>
+          <Smartphone className="size-4 text-muted" />
+          {ready.length === 0 ? (
+            <span className="text-sm text-muted">Sin dispositivos conectados</span>
+          ) : (
+            <select
+              value={selected ?? ""}
+              onChange={(e) => selectDevice(e.target.value)}
+              className="rounded-md border border-border bg-surface-2 px-2 py-1.5 text-sm outline-none focus:border-accent"
+            >
+              {ready.map((d) => (
+                <option key={d.serial} value={d.serial}>
+                  {d.model ?? d.serial} ({d.serial})
+                </option>
+              ))}
+            </select>
+          )}
+        </>
       )}
 
       {current &&
@@ -81,7 +114,16 @@ export function Topbar() {
           <RefreshCw className={"size-3.5 " + (refreshing ? "animate-spin" : "")} />
           Actualizar
         </button>
+        <button
+          onClick={() => setSettingsOpen(true)}
+          className="flex items-center rounded-md border border-border bg-surface-2 p-2 hover:border-accent"
+          title="Ajustes de ADB"
+        >
+          <Settings className="size-4" />
+        </button>
       </div>
-    </header>
+      </header>
+      {settingsOpen && <AdbSettings onClose={() => setSettingsOpen(false)} />}
+    </>
   );
 }

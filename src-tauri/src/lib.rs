@@ -16,6 +16,7 @@ pub fn run() {
             adb::adb_shell,
             adb::adb_logcat_start,
             adb::adb_logcat_stop,
+            adb::adb_install,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

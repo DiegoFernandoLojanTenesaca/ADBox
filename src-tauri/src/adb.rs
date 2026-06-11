@@ -6,14 +6,14 @@
 //! de ejecución hace la herramienta auditable (es open source) y portable.
 
 use std::collections::HashMap;
-use std::io::{BufRead, BufReader};
-use std::path::PathBuf;
+use std::io::{BufRead, BufReader, Read};
+use std::path::{Path, PathBuf};
 use std::process::{Child, Command, Stdio};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Mutex;
 
 use serde::Serialize;
-use tauri::{AppHandle, Emitter, State};
+use tauri::{AppHandle, Emitter, Manager, State};
 
 /// Oculta la ventana de consola que Windows abriría por cada invocación de adb.
 #[cfg(windows)]
@@ -341,4 +341,80 @@ pub fn adb_logcat_stop(state: State<'_, AdbState>, id: u32) {
     if let Some(mut child) = state.streams.lock().unwrap().remove(&id) {
         let _ = child.kill();
     }
+}
+
+// ─────────────────────────── Instalación de ADB ───────────────────────────
+
+/// URL del paquete oficial `platform-tools` de Google para este sistema.
+fn platform_tools_url() -> &'static str {
+    if cfg!(target_os = "windows") {
+        "https://dl.google.com/android/repository/platform-tools-latest-windows.zip"
+    } else if cfg!(target_os = "macos") {
+        "https://dl.google.com/android/repository/platform-tools-latest-darwin.zip"
+    } else {
+        "https://dl.google.com/android/repository/platform-tools-latest-linux.zip"
+    }
+}
+
+/// Descarga y extrae platform-tools en `data_dir`, devolviendo la ruta de adb.
+fn install_platform_tools(data_dir: &Path) -> Result<String, String> {
+    std::fs::create_dir_all(data_dir).map_err(|e| format!("No se pudo crear la carpeta: {e}"))?;
+
+    // 1) Descargar el ZIP oficial de Google.
+    let resp = ureq::get(platform_tools_url())
+        .call()
+        .map_err(|e| format!("Fallo al descargar platform-tools: {e}"))?;
+    let mut bytes = Vec::new();
+    resp.into_reader()
+        .read_to_end(&mut bytes)
+        .map_err(|e| format!("Fallo al leer la descarga: {e}"))?;
+
+    // 2) Extraer (sobrescribe una instalación previa).
+    let reader = std::io::Cursor::new(bytes);
+    let mut archive =
+        zip::ZipArchive::new(reader).map_err(|e| format!("ZIP inválido: {e}"))?;
+    archive
+        .extract(data_dir)
+        .map_err(|e| format!("Fallo al extraer: {e}"))?;
+
+    // 3) Localizar el binario adb dentro de platform-tools/.
+    let adb_name = if cfg!(windows) { "adb.exe" } else { "adb" };
+    let adb_path = data_dir.join("platform-tools").join(adb_name);
+    if !adb_path.exists() {
+        return Err("No se encontró adb tras la extracción.".to_string());
+    }
+
+    // 4) Marcar como ejecutable en sistemas Unix.
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut perms = std::fs::metadata(&adb_path)
+            .map_err(|e| e.to_string())?
+            .permissions();
+        perms.set_mode(0o755);
+        std::fs::set_permissions(&adb_path, perms).map_err(|e| e.to_string())?;
+    }
+
+    Ok(adb_path.to_string_lossy().to_string())
+}
+
+/// Descarga e instala ADB automáticamente (platform-tools de Google) en la
+/// carpeta de datos de la app, y lo deja como adb activo. Devuelve su ruta.
+#[tauri::command]
+pub async fn adb_install(app: AppHandle, state: State<'_, AdbState>) -> Result<String, String> {
+    let data_dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| format!("No se pudo resolver la carpeta de datos: {e}"))?;
+
+    let bin = tauri::async_runtime::spawn_blocking(move || install_platform_tools(&data_dir))
+        .await
+        .map_err(|e| e.to_string())??;
+
+    // Verificar que responde y fijarlo como adb activo.
+    if !probe(&PathBuf::from(&bin)) {
+        return Err("ADB se instaló pero no responde a `adb version`.".to_string());
+    }
+    *state.path.lock().unwrap() = bin.clone();
+    Ok(bin)
 }

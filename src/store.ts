@@ -31,6 +31,8 @@ interface AppState {
   refreshDevices: () => Promise<void>;
   selectDevice: (serial: string | null) => void;
   setAdbPath: (path: string) => Promise<void>;
+  installing: boolean;
+  installAdb: () => Promise<void>;
 
   // ── navegación ──────────────────────────────────────────────────────
   activeCategory: CategoryId;
@@ -118,6 +120,26 @@ export const useStore = create<AppState>((set, get) => ({
       await get().refreshDevices();
     } catch (e) {
       get().appendLog(String(e), "error");
+    }
+  },
+
+  installing: false,
+
+  installAdb: async () => {
+    if (get().installing) return;
+    set({ installing: true });
+    get().appendLog("Descargando ADB (platform-tools oficial de Google)…", "info");
+    try {
+      const path = await adb.installAdb();
+      set({ adbPath: path, adbReady: true });
+      get().appendLog(`ADB instalado en: ${path}`, "ok");
+      const ver = await adb.version();
+      if (ver.success) get().appendLog(ver.stdout.split("\n")[0] ?? "adb listo", "ok");
+      await get().refreshDevices();
+    } catch (e) {
+      get().appendLog(`No se pudo instalar ADB: ${String(e)}`, "error");
+    } finally {
+      set({ installing: false });
     }
   },
 

@@ -29,3 +29,6 @@ export const logcatStart = (serial: string | null, args: string[]) =>
 
 /** Detiene un stream de logcat por id. */
 export const logcatStop = (id: number) => invoke<void>("adb_logcat_stop", { id });
+
+/** Descarga e instala ADB automáticamente (platform-tools de Google). */
+export const installAdb = () => invoke<string>("adb_install");
