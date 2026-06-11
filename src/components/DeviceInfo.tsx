@@ -25,7 +25,7 @@ interface DevInfo {
 export function DeviceInfo() {
   const serial = useStore((s) => s.selectedSerial);
   const devices = useStore((s) => s.devices);
-  const conn = devices.find((d) => d.serial === serial)?.connection;
+  const device = devices.find((d) => d.serial === serial);
 
   const [info, setInfo] = useState<DevInfo | null>(null);
   const [loading, setLoading] = useState(false);
@@ -75,20 +75,26 @@ export function DeviceInfo() {
 
   if (!serial) return null;
 
+  // El modelo: primero getprop, si no lo de `adb devices -l`, y por último el serial.
+  const modelo = info?.model || device?.model || serial;
+  const marca = info?.brand || device?.product || "Dispositivo Android";
+
   return (
-    <div className="flex flex-wrap items-center gap-4 border-b border-border bg-surface/60 px-5 py-3">
-      <div className="flex size-11 items-center justify-center rounded-xl bg-accent/15 text-accent">
+    <div className="flex flex-wrap items-center gap-4 border-b border-border bg-surface px-5 py-3">
+      <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-accent/15 text-accent">
         <Smartphone className="size-6" />
       </div>
 
-      <div className="min-w-0">
+      <div>
         <div className="flex items-center gap-2">
-          <span className="truncate text-base font-semibold">
-            {info?.model || serial}
+          <span className="text-lg font-bold text-[color:var(--color-text)]">
+            {modelo}
           </span>
-          {loading && <Loader2 className="size-3.5 animate-spin text-muted" />}
+          {loading && (
+            <Loader2 className="size-4 animate-spin text-muted" />
+          )}
         </div>
-        <div className="text-xs text-muted">{info?.brand || "Leyendo…"}</div>
+        <div className="text-sm text-muted">{marca}</div>
       </div>
 
       <div className="ml-auto flex flex-wrap items-center gap-2">
@@ -103,9 +109,9 @@ export function DeviceInfo() {
           value={info ? `${info.level}% · ${info.temp} °C` : "…"}
         />
         <Chip
-          icon={conn === "tcp" ? <Wifi className="size-3.5" /> : <Usb className="size-3.5" />}
+          icon={device?.connection === "tcp" ? <Wifi className="size-3.5" /> : <Usb className="size-3.5" />}
           label="Conexión"
-          value={conn === "tcp" ? "Wi-Fi" : "USB"}
+          value={device?.connection === "tcp" ? "Wi-Fi" : "USB"}
         />
         <Chip icon={<Hash className="size-3.5" />} label="Serie" value={serial} />
       </div>
@@ -127,7 +133,9 @@ function Chip({
       <span className="text-muted">{icon}</span>
       <div className="leading-tight">
         <div className="text-[10px] uppercase tracking-wide text-muted">{label}</div>
-        <div className="text-xs font-medium">{value}</div>
+        <div className="text-xs font-semibold text-[color:var(--color-text)]">
+          {value}
+        </div>
       </div>
     </div>
   );

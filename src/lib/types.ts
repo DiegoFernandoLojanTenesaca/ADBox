@@ -89,6 +89,8 @@ export interface AdbAction {
   category: CategoryId;
   label: string;
   description: string;
+  /** Detalle ampliado (qué hace exactamente), mostrado en el tooltip de la «i». */
+  detail?: string;
   danger: Danger;
   /** false → tarjeta visible pero marcada como "próximamente". */
   implemented: boolean;

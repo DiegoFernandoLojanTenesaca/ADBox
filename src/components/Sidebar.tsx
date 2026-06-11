@@ -47,8 +47,8 @@ export function Sidebar() {
 
   return (
     <nav className="flex h-full w-64 shrink-0 flex-col border-r border-border bg-surface">
-      <div className="flex items-center gap-2 px-4 py-4">
-        <Sparkles className="size-5 text-accent" />
+      <div className="flex items-center gap-2.5 px-4 py-4">
+        <img src="/icon.png" alt="ADBox" className="size-8 rounded-lg" />
         <div>
           <div className="font-semibold leading-tight">ADBox</div>
           <div className="text-xs text-muted">Consola ADB libre</div>

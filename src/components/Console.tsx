@@ -24,11 +24,11 @@ export function Console() {
   }, [log]);
 
   return (
-    <div className="flex h-64 shrink-0 flex-col border-t border-border bg-bg">
-      <div className="flex items-center gap-2 border-b border-border px-4 py-2">
+    <div className="flex w-[400px] shrink-0 flex-col border-l border-border bg-bg">
+      <div className="flex items-center gap-2 border-b border-border px-4 py-2.5">
         <TerminalSquare className="size-4 text-muted" />
         <span className="text-sm font-medium">Consola</span>
-        <span className="text-xs text-muted">{log.length} líneas</span>
+        <span className="text-xs text-muted">{log.length}</span>
         <button
           onClick={clearLog}
           className="ml-auto flex items-center gap-1.5 rounded-md px-2 py-1 text-xs text-muted hover:bg-surface-2 hover:text-text"

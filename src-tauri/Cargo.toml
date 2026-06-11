@@ -1,6 +1,6 @@
 [package]
 name = "adbox"
-version = "1.0.2"
+version = "1.0.3"
 description = "ADBox — consola ADB libre para mantenimiento y reparación de Android"
 authors = ["ADBox contributors"]
 edition = "2021"
